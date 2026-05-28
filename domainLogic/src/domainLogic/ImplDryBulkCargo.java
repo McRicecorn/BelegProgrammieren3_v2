@@ -79,4 +79,20 @@ public class ImplDryBulkCargo implements DryBulkCargo {
     public Date getInsertionDate() {
         return insertionDate;
     }
+
+    @Override
+    public String toString() {
+        return "DryBulkCargo{" +
+                "customer=" + owner.getName() +
+                ", duration=" + durationOfStorage  +
+                ", storageLocation=" + storageLocation +
+                ", value=" + value +
+                ", hazards=" + hazards +
+                ", grainSize=" + grainSize +
+                ", lastInspectionDate=" + lastInspectionDate +
+
+                '}';
+    }
+
+
 }

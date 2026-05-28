@@ -1,6 +1,7 @@
 package domainLogic;
 
 import administration.Customer;
+import cargo.DryBulkAndUnitisedCargo;
 import cargo.Hazard;
 
 import java.math.BigDecimal;
@@ -8,7 +9,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Date;
 
-public class ImplDryBulkAndUnitisedCargo {
+public class ImplDryBulkAndUnitisedCargo implements DryBulkAndUnitisedCargo {
 
     private boolean isFragile;  //UnitisedCargo-spezifische Attribute
     private Customer owner;     //Storage-spezifische Attribute
@@ -76,6 +77,19 @@ public class ImplDryBulkAndUnitisedCargo {
         return insertionDate;
     }
 
+    @Override
+    public String toString() {
+        return "DryBulkAndUnitisedCargo{" +
+                "customer=" + owner.getName() +
+                ", duration=" + durationOfStorage +
+                ", storageLocation=" + storageLocation +
+                ", value=" + value +
+                ", hazards=" + hazards +
+                ", grainSize=" + grainSize +
+                ", fragile=" + isFragile +
+                ", lastInspectionDate=" + lastInspectionDate +
+                '}';
+    }
 
 
 }

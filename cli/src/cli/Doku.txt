@@ -1,0 +1,114 @@
+Das CLI stellt vier grundlegende Befehle zur Verwaltung von Frachtstücken bereit:
+
+Einfügen eines Frachtstücks (Create)
+
+Anzeigen aller Frachtstücke (Read)
+
+Ändern des Inspektionsdatums eines Frachtstücks (Update)
+
+Entfernen eines Frachtstücks (Delete)
+
+Befehlssatz
+1. Create Cargo
+Der Benutzer kann ein neues Frachtstück anlegen.
+Es stehen drei vordefinierte Typen zur Auswahl:
+
+Dry Bulk Cargo
+
+Unitised Cargo
+
+Dry Bulk and Unitised Cargo
+
+Eingaben:
+
+Kundenname (muss vorher registriert sein)
+
+Dauer der Lagerung (Tage)
+
+Lagerort (int, muss frei sein)
+
+Wert (decimal)
+
+Gefahrenklassen (z.B „1,3“)
+
+Typ‑spezifische Felder (z.B. grainSize oder fragile)
+
+Beispiel:
+
+Code
+1
+1
+Jessie
+12
+3
+100.0
+1,4
+10
+2. View Cargos
+Zeigt die gespeicherten Frachtstücke an.
+
+Optionen:
+
+Nur Dry Bulk Cargo
+
+Nur Unitised Cargo
+
+Nur Dry Bulk and Unitised Cargo
+
+Alle Frachtstücke
+
+Die Ausgabe erfolgt über toString() der jeweiligen Cargo‑Objekte.
+
+Beispiel:
+
+Code
+4
+1
+3. Update Cargo Inspection Date
+Ändert das Inspektionsdatum eines bestehenden Frachtstücks.
+
+Ablauf:
+
+Benutzer gibt den Lagerort ein
+
+Das CLI ermittelt den Cargo‑Typ automatisch
+
+Benutzer gibt ein Datum im Format YYYY-MM-DD ein
+
+Das passende Update‑Verfahren der Geschäftslogik wird aufgerufen
+
+Beispiel:
+
+Code
+2
+3
+2024-12-31
+4. Delete Cargo
+Entfernt ein Frachtstück anhand seines Lagerorts.
+
+Ablauf:
+
+Benutzer gibt Lagerort ein
+
+Cargo wird anhand des Typs erkannt
+
+Passende Delete‑Methode wird aufgerufen
+
+Beispiel:
+
+Code
+3
+3
+5. Add Customer
+Registriert einen neuen Kunden, der anschließend für Cargo‑Erstellung verwendet werden kann.
+
+Beispiel:
+
+Code
+6
+Jessie
+6. View Customers
+Zeigt alle registrierten Kunden an.
+
+7. Exit
+Beendet das CLI.

@@ -75,4 +75,20 @@ public class ImplUnitisedCargo implements UnitisedCargo {
     public Date getInsertionDate() {
         return insertionDate;
     }
+
+
+    @Override
+    public String toString() {
+        return "UnitisedCargo{" +
+                "customer=" + owner.getName() +
+                ", duration=" + durationOfStorage +
+                ", storageLocation=" + storageLocation +
+                ", value=" + value +
+                ", hazards=" + hazards +
+                ", fragile=" + isFragile +
+                ", lastInspectionDate=" + lastInspectionDate +
+
+                '}';
+    }
+
 }

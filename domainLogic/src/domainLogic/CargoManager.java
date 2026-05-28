@@ -1,6 +1,7 @@
 package domainLogic;
 
 
+import cargo.Cargo;
 import cargo.Hazard;
 
 
@@ -126,6 +127,10 @@ public class CargoManager  {
         return new ArrayList<>(dryBulkAndUnitisedCargoList);
     }
 
+    public List<Customer> readCustomers() {
+        return new ArrayList<>(customers);
+    }
+
     //Update
     public boolean updateDryBulkCargo(ImplDryBulkCargo cargo, Date lastInspectionDate) {
         if (cargo == null || lastInspectionDate == null) return false;
@@ -190,8 +195,49 @@ public class CargoManager  {
                 || dryBulkAndUnitisedCargoList.stream().anyMatch(c -> c.getStorageLocation() == location);
     }
 
-    public void registerCustomer(Customer c) {
+    public boolean registerCustomer(Customer c) {
+        if (c == null || customers.contains(c)) {
+            return false;
+        }
         customers.add(c);
+        return true;
+    }
+
+    public Customer getCustomerByName(String name) {
+        Customer customer = null;
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
+        for (Customer c : customers) {
+            if (c.getName().equals(name)) {
+                customer = c;
+                break;
+
+            }
+        }
+        return customer;
+    }
+
+    public Cargo getCargoByStorageLocation(int storageLocation) {
+        if (storageLocation < 0) {
+            return null;
+        }
+        for (ImplDryBulkCargo cargo : dryBulkCargoList) {
+            if (cargo.getStorageLocation() == storageLocation) {
+                return cargo;
+            }
+        }
+        for (ImplUnitisedCargo cargo : unitisedCargoList) {
+            if (cargo.getStorageLocation() == storageLocation) {
+                return cargo;
+            }
+        }
+        for (ImplDryBulkAndUnitisedCargo cargo : dryBulkAndUnitisedCargoList) {
+            if (cargo.getStorageLocation() == storageLocation) {
+                return cargo;
+            }
+        }
+        return null;
     }
 
 }
