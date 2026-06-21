@@ -77,19 +77,6 @@ public class ImplDryBulkAndUnitisedCargo implements DryBulkAndUnitisedCargo {
         return insertionDate;
     }
 
-    @Override
-    public String toString() {
-        return "DryBulkAndUnitisedCargo{" +
-                "customer=" + owner.getName() +
-                ", duration=" + durationOfStorage +
-                ", storageLocation=" + storageLocation +
-                ", value=" + value +
-                ", hazards=" + hazards +
-                ", grainSize=" + grainSize +
-                ", fragile=" + isFragile +
-                ", lastInspectionDate=" + lastInspectionDate +
-                '}';
-    }
 
 
 }

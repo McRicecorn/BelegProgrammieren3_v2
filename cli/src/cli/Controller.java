@@ -1,18 +1,37 @@
 package cli;
 
+import administration.Customer;
 import cargo.Cargo;
 import cargo.Hazard;
-import cargo.UnitisedCargo;
+import cli.Events.CustomerEvent;
+import cli.Handler.BasisKlassen.CargoEventHandler;
+import cli.Handler.BasisKlassen.ReadCargoEventHandler;
+import cli.Handler.ReadCustomerEventHandler;
+import cli.Payloads.*;
 import domainLogic.*;
 
 import java.math.BigDecimal;
-import java.sql.SQLOutput;
 import java.time.Duration;
 import java.util.*;
 
 public class Controller {
-    public static void main(String[] args) {
-        CargoManager cargoManager = new CargoManager();
+
+
+    public Controller() {
+    }
+
+    private CargoEventHandler createHandler;
+    private ReadCargoEventHandler readCargoEventHandler;
+    private ReadCustomerEventHandler readCustomerEventHandler;
+    public void setCreateHandler(CargoEventHandler createHandler, ReadCargoEventHandler readCargoEventHandler, ReadCustomerEventHandler readCustomerEventHandler) {
+        this.createHandler = createHandler;
+        this.readCargoEventHandler = readCargoEventHandler;
+        this.readCustomerEventHandler = readCustomerEventHandler;
+    }
+
+
+    public void start() {
+
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
@@ -25,7 +44,6 @@ public class Controller {
                     + "\n5. View Customers"
                     + "\n6. Add Customer"
                     + "\n7. Exit");
-
             int choice = scanner.nextInt();
             switch (choice) {
                 case 1:
@@ -47,7 +65,7 @@ public class Controller {
 
                             String name = scanner.nextLine();
                             System.out.println("The chosen name is: " + name);
-                            Customer customer = cargoManager.getCustomerByName(name);
+                            ImplCustomer customer = new ImplCustomer(name);
 
                             System.out.println("Enter duration of storage (in days): ");
                             int duration = scanner.nextInt();
@@ -88,13 +106,24 @@ public class Controller {
                             int grainSize = scanner.nextInt();
                             System.out.println("The chosen grain size is: " + grainSize);
 
+                            PayloadDryBulkCargo payload = new PayloadDryBulkCargo(grainSize, value1, hazards, customer, durationOfStorage, storageLocation);
+                            CargoEvent event = new CargoEvent(this,payload);
 
-                            boolean created = cargoManager.createDryBulkCargo(customer, durationOfStorage, storageLocation, value1, hazards, grainSize);
-                            if (created) {
-                                System.out.println("Dry Bulk Cargo created successfully!");
-                            } else {
-                                System.out.println("Failed to create Dry Bulk Cargo. Please check your input and try again.");
+                            boolean handled = false;
+                            if(null!= createHandler){
+                                boolean handler= createHandler.handle(event);
+                                if(handler){
+                                    handled = true;
+                                }
                             }
+                            if (handled) {
+                                System.out.println("Dry Bulk Cargo created successfully!");
+
+                            }else{
+                                System.out.println("Failed to create Dry Bulk Cargo.");
+                            }
+
+
 
 
                             break;
@@ -104,7 +133,7 @@ public class Controller {
 
                             System.out.print("Enter Customer name: ");
                             String nameUni = scanner.nextLine();
-                            Customer customerUni = new Customer(nameUni);
+                            ImplCustomer customerUni = new ImplCustomer(nameUni);
 
                             System.out.print("Enter duration of storage (in days): ");
                             int durationUni = scanner.nextInt();
@@ -145,20 +174,23 @@ public class Controller {
                             System.out.print("Is the cargo fragile? (true/false): ");
                             boolean isFragile = scanner.nextBoolean();
 
-                            boolean createdUni = cargoManager.createUnitisedCargo(
-                                    isFragile,
-                                    valueUnitised,
-                                    hazardsUni,
-                                    customerUni,
-                                    durationOfStorageUni,
-                                    storageLocationUni
-                            );
+                            PayloadUnitisedCargo payloadUnitisedCargo = new PayloadUnitisedCargo(isFragile, valueUnitised, hazardsUni, customerUni, durationOfStorageUni, storageLocationUni);
+                            CargoEvent eventUnitisedCargo = new CargoEvent(this,payloadUnitisedCargo);
 
-                            if (createdUni) {
-                                System.out.println("Unitised Cargo created successfully!");
-                            } else {
-                                System.out.println("Failed to create Unitised Cargo.");
-                            }
+                                boolean handledUnitisedCargo = false;
+                                if(null!= createHandler){
+                                    boolean handler= createHandler.handle(eventUnitisedCargo);
+                                    if(handler){
+                                        handledUnitisedCargo = true;
+                                    }
+                                }
+                                if (handledUnitisedCargo) {
+                                    System.out.println("Unitised Cargo created successfully!");
+                                }else {
+                                    System.out.println("Failed to create Unitised Cargo.");
+                                }
+
+
 
                             break;
 
@@ -168,7 +200,7 @@ public class Controller {
 
                             System.out.print("Enter Customer name: ");
                             String nameDryAndUni = scanner.nextLine();
-                            Customer customerDryAndUni = new Customer(nameDryAndUni);
+                            ImplCustomer customerDryAndUni = new ImplCustomer(nameDryAndUni);
 
                             System.out.print("Enter duration of storage (in days): ");
                             int durationDryAndUni = scanner.nextInt();
@@ -212,29 +244,27 @@ public class Controller {
                             System.out.print("Is the cargo fragile? (true/false): ");
                             boolean isFragileDryAndUni = scanner.nextBoolean();
 
-                            boolean createdDryAndUni = cargoManager.createDryBulkCargoAndUnitisedCargo(
-                                    grainSizeDryAndUni,
-                                    valueDryAndUni,
-                                    hazardsDryAndUni,
-                                    customerDryAndUni,
-                                    durationOfStorageDryAndUni,
-                                    storageLocationDryAndUni,
-                                    isFragileDryAndUni
-                            );
+                            PayloadDryAndUnitisedCargo payloadDryAndUnitisedCargo = new PayloadDryAndUnitisedCargo(grainSizeDryAndUni, valueDryAndUni, hazardsDryAndUni, customerDryAndUni, durationOfStorageDryAndUni, storageLocationDryAndUni, isFragileDryAndUni);
 
-                            if (createdDryAndUni) {
-                                System.out.println("Dry Bulk and Unitised Cargo created successfully!");
-                            } else {
-                                System.out.println("Failed to create Dry Bulk and Unitised Cargo.");
-                            }
+                            CargoEvent eventDryAndUnitisedCargo = new CargoEvent(this,payloadDryAndUnitisedCargo);
+
+                                boolean handledDryAndUnitisedCargo = false;
+                                if(null!= createHandler){
+                                    boolean handler= createHandler.handle(eventDryAndUnitisedCargo);
+                                    if(handler){
+                                        handledDryAndUnitisedCargo = true;
+                                    }
+                                }
+                                if (handledDryAndUnitisedCargo) {
+                                    System.out.println("Dry Bulk and Unitised Cargo created successfully!");
+                                }else {
+                                    System.out.println("Failed to create Dry Bulk and Unitised Cargo.");
+                                }
 
                             break;
 
                         default:
                             System.out.println("Invalid cargo type. Please try again.");
-
-
-                            // Call createCargo method here
                             break;
                     }
 
@@ -245,39 +275,39 @@ public class Controller {
                             "\nWhich Cargo do you want to update? (Enter Storage Location): ") ;
                     int storageLocation = scanner.nextInt();
                     scanner.nextLine();
-                    Cargo cargoTypeToUpdate = cargoManager.getCargoByStorageLocation(storageLocation);
-                    if (cargoTypeToUpdate == null) {
-                        System.out.println("No cargo found at this storage location.");
-                        break;
-                    }
 
-                    System.out.println("Enter new inspection date (YYYY-MM-DD): (example: 2024-12-31)");
+
+                    System.out.println("Enter new inspection date (YYYY-MM-DD): ");
                     String newInspectionDateStr = scanner.nextLine();
+                    Date newInspectionDate = java.sql.Date.valueOf(newInspectionDateStr);
 
-                    Date newInspectionDate;
-                    try {
-                        newInspectionDate = java.sql.Date.valueOf(newInspectionDateStr);
-                    } catch (Exception e) {
-                        System.out.println("Invalid date format. Please use YYYY-MM-DD.");
-                        break;
+                    PayloadUpdate payloadUpdate = new PayloadUpdate(storageLocation, newInspectionDate);
+                    CargoEvent eventUpdate = new CargoEvent(this, payloadUpdate);
+                    boolean handledUpdate = false;
+                    if(null!= createHandler){
+                        boolean handler= createHandler.handle(eventUpdate);
+                        if(handler){
+                            handledUpdate = true;
+                        }
                     }
+
+                        if (handledUpdate) {
+                                        System.out.println("Cargo inspection date updated successfully!");
+
+                                    }else{
+                                        System.out.println("Failed to update Cargo inspection date.");
+                                    }
+
+
+
+
+
+
 
 
                     boolean updated = false;
 
-                    if (cargoTypeToUpdate instanceof ImplDryBulkCargo dry) {
-                        updated = cargoManager.updateDryBulkCargo(dry, newInspectionDate);
-                    } else if (cargoTypeToUpdate instanceof ImplUnitisedCargo uni) {
-                        updated = cargoManager.updateUnitisedCargo(uni, newInspectionDate);
-                    } else if (cargoTypeToUpdate instanceof ImplDryBulkAndUnitisedCargo both) {
-                        updated = cargoManager.updateDryBulkAndUnitisedCargo(both, newInspectionDate);
-                    }
 
-                    if (updated) {
-                        System.out.println("Inspection date updated successfully!");
-                    } else {
-                        System.out.println("Failed to update inspection date.");
-                    }
 
                     break;
 
@@ -290,28 +320,6 @@ public class Controller {
                     int deleteLocation = scanner.nextInt();
                     scanner.nextLine(); // Buffer leeren
 
-                    Cargo cargoToDelete = cargoManager.getCargoByStorageLocation(deleteLocation);
-
-                    if (cargoToDelete == null) {
-                        System.out.println("No cargo found at this storage location.");
-                        break;
-                    }
-
-                    boolean deleted = false;
-
-                    if (cargoToDelete instanceof ImplDryBulkCargo dry) {
-                        deleted = cargoManager.deleteDryBulkCargo(dry);
-                    } else if (cargoToDelete instanceof ImplUnitisedCargo uni) {
-                        deleted = cargoManager.deleteUnitisedCargo(uni);
-                    } else if (cargoToDelete instanceof ImplDryBulkAndUnitisedCargo both) {
-                        deleted = cargoManager.deleteDryBulkAndUnitisedCargo(both);
-                    }
-
-                    if (deleted) {
-                        System.out.println("Cargo deleted successfully!");
-                    } else {
-                        System.out.println("Failed to delete cargo.");
-                    }
 
 
 
@@ -322,8 +330,9 @@ public class Controller {
                     System.out.println("Which Cargo type do you want to view?" +
                             "\n1. Dry Bulk Cargo" +
                             "\n2. Unitised Cargo" +
-                            "\n3. Dry Bulk and Unitised Cargo" +
-                            "\n4. All Cargos");
+                            "\n3. Dry Bulk and Unitised Cargo"
+                    //        "\n4. All Cargos"
+                    );
                     int viewCargoType = scanner.nextInt();
 
                     switch (viewCargoType) {
@@ -331,46 +340,94 @@ public class Controller {
                         case 1:
                             System.out.println("List of Dry Bulk Cargos:");
                             // Call method to get and display Dry Bulk Cargos
+                            PayloadDryBulkCargo payloadDryBulkCargo = new PayloadDryBulkCargo(0, null, null, null, null, 0);
+                            CargoEvent eventViewDryBulkCargo = new CargoEvent(this, payloadDryBulkCargo);
 
-                            List<ImplDryBulkCargo> dryBulkCargos = cargoManager.readDryBulkCargo();
+                            List<? extends Cargo> temp = readCargoEventHandler.handle(eventViewDryBulkCargo);
+                            List<Cargo> dryBulk = new ArrayList<>(temp);
+                            for (Cargo cargo : dryBulk) {
+                                if (cargo instanceof ImplDryBulkCargo) {
+                                    System.out.println(
+                                            "Customer: " + ((ImplDryBulkCargo) cargo).getOwner().getName() +
+                                            ", Duration of Storage: " + ((ImplDryBulkCargo) cargo).getDurationOfStorage() + " days" +
+                                            ", Storage Location: " + ((ImplDryBulkCargo) cargo).getStorageLocation() +
+                                            ", Last Inspectiondate: " + ((ImplDryBulkCargo) cargo).getLastInspectionDate() +
+                                            ", Value: " + cargo.getValue() +
+                                            ", Hazards: " + cargo.getHazards() +
+                                            ", Grain Size: " + ((ImplDryBulkCargo) cargo).getGrainSize()
+                                    );
+                                }
+
+                            }
 
 
 
-                            System.out.println(dryBulkCargos.toString());
 
                             break;
                         case 2:
                             System.out.println("List of Unitised Cargos:");
 
-                            List<ImplUnitisedCargo> unitisedCargos = cargoManager.readUnitisedCargo();
+                                PayloadUnitisedCargo payloadUnitisedCargo = new PayloadUnitisedCargo(false, null, null, null, null, 0);
+                                CargoEvent eventViewUnitisedCargo = new CargoEvent(this, payloadUnitisedCargo);
 
-                            System.out.println(unitisedCargos.toString());
+
+                            List<? extends Cargo> tempUni = readCargoEventHandler.handle( eventViewUnitisedCargo);
+                            List<Cargo> unitised = new ArrayList<>(tempUni);
+                            for (Cargo cargo : unitised) {
+                                if (cargo instanceof ImplUnitisedCargo) {
+                                    System.out.println(
+                                            "Customer: " + ((ImplUnitisedCargo) cargo).getOwner().getName() +
+                                            "Fragile: " + ((ImplUnitisedCargo) cargo).isFragile() +
+                                            ", Duration of Storage: " + ((ImplUnitisedCargo) cargo).getDurationOfStorage() + " days" +
+                                            ", Storage Location: " + ((ImplUnitisedCargo) cargo).getStorageLocation() +
+                                            ", Last Inspectiondate: " + ((ImplUnitisedCargo) cargo).getLastInspectionDate() +
+                                            ", Value: " + cargo.getValue() +
+                                            ", Hazards: " + cargo.getHazards()
+                                    );
+                                }
+
+                            }
+
 
 
                             break;
                         case 3:
                             System.out.println("List of Dry Bulk and Unitised Cargos:");
 
-                            List<ImplDryBulkAndUnitisedCargo> dryBulkAndUnitisedCargos = cargoManager.readDryBulkAndUnitisedCargo();
+                            PayloadDryAndUnitisedCargo payloadDryAndUnitisedCargo = new PayloadDryAndUnitisedCargo(0, null, null, null, null, 0, false);
+                            CargoEvent eventViewDryAndUnitisedCargo = new CargoEvent(this, payloadDryAndUnitisedCargo);
 
-                            System.out.println(dryBulkAndUnitisedCargos.toString());
+                            List<? extends Cargo> tempDryAndUnitised = readCargoEventHandler.handle(eventViewDryAndUnitisedCargo);
+                            List<Cargo> dryAndUnitised = new ArrayList<>(tempDryAndUnitised);
+                            for (Cargo cargo : dryAndUnitised) {
+                                if (cargo instanceof ImplDryBulkAndUnitisedCargo) {
+                                    System.out.println(
+                                            "Customer: " + ((ImplDryBulkAndUnitisedCargo) cargo).getOwner().getName() +
+                                            "Fragile: " + ((ImplDryBulkAndUnitisedCargo) cargo).isFragile() +
+                                            ", Duration of Storage: " + ((ImplDryBulkAndUnitisedCargo) cargo).getDurationOfStorage() + " days" +
+                                            ", Storage Location: " + ((ImplDryBulkAndUnitisedCargo) cargo).getStorageLocation() +
+                                            ", Last Inspectiondate: " + ((ImplDryBulkAndUnitisedCargo) cargo).getLastInspectionDate() +
+                                            ", Value: " + cargo.getValue() +
+                                            ", Hazards: " + cargo.getHazards() +
+                                            ", Grain Size: " + ((ImplDryBulkAndUnitisedCargo) cargo).getGrainSize()
+                                    );
+                                }
+
+                            }
 
                             break;
+                            /*
                         case 4:
                             System.out.println("List of All Cargos:");
                             System.out.println("Dry Bulk Cargos:");
-                            List<ImplDryBulkCargo> allDryBulkCargos = cargoManager.readDryBulkCargo();
-                            System.out.println(allDryBulkCargos.toString());
 
                             System.out.println("Unitised Cargos:");
-                            List<ImplUnitisedCargo> allUnitisedCargos = cargoManager.readUnitisedCargo();
-                            System.out.println(allUnitisedCargos.toString());
 
                             System.out.println("Dry Bulk and Unitised Cargos:");
-                            List<ImplDryBulkAndUnitisedCargo> allDryBulkAndUnitisedCargos = cargoManager.readDryBulkAndUnitisedCargo();
-                            System.out.println(allDryBulkAndUnitisedCargos.toString());
 
                             break;
+
+                             */
                         default:
                             System.out.println("Invalid option. Please try again.");
 
@@ -381,8 +438,15 @@ public class Controller {
                 case 5:
                     // View Customers
                      System.out.println("List of Customers:");
-                     List<Customer> customers = cargoManager.readCustomers();
-                     System.out.println(customers.toString());
+
+
+                     CustomerEvent eventCustomer = new CustomerEvent(this, null);
+
+                    List<? extends Customer> customers = readCustomerEventHandler.handle(eventCustomer);
+
+                    for (Customer customer : customers) {
+                        System.out.println("Customer Name: " + customer.getName());
+                    }
 
 
                     break;
@@ -393,13 +457,20 @@ public class Controller {
                     System.out.println("Adding a new customer." +
                             "\nEnter Customer name: ");
 
-                    String customerName = scanner.nextLine();
-                    boolean registered = cargoManager.registerCustomer(new Customer(customerName));
-                    if (registered) {
-                        System.out.println("Customer added successfully!");
-                    } else {
-                        System.out.println("Failed to add customer. Please check your input and try again.");
-                    }
+                    ImplCustomer customerName = new ImplCustomer(scanner.nextLine());
+
+                    PayloadCustomer payloadCustomer = new PayloadCustomer(customerName);
+
+                    CargoEvent newCustomer = new CargoEvent(this,payloadCustomer);
+
+                    boolean handled = createHandler.handle(newCustomer);
+
+                        if (handled) {
+                                    System.out.println("Customer added successfully!");
+
+                                }else{
+                                    System.out.println("Failed to add Customer.");
+                                }
 
                     break;
 

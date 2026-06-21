@@ -1,6 +1,6 @@
 package domainLogic;
 
-import administration.Customer;
+
 import cargo.DryBulkCargo;
 import cargo.Hazard;
 
@@ -12,7 +12,7 @@ import java.util.Date;
 public class ImplDryBulkCargo implements DryBulkCargo {
 
 
-    private Customer owner;//Storage-spezifische Attribute
+    private ImplCustomer owner;//Storage-spezifische Attribute
     private Duration durationOfStorage;
     private Date lastInspectionDate;
     private int storageLocation;
@@ -26,7 +26,7 @@ public class ImplDryBulkCargo implements DryBulkCargo {
     private Date insertionDate; // Storage-spezifisches Attribut
 
     public ImplDryBulkCargo(int grainSize, BigDecimal value,
-                            Collection<Hazard> hazards, Customer owner,
+                            Collection<Hazard> hazards, ImplCustomer owner,
                             Duration durationOfStorage ,
                             int storageLocation) {
         this.owner = owner;
@@ -58,7 +58,7 @@ public class ImplDryBulkCargo implements DryBulkCargo {
     }
 
     @Override
-    public Customer getOwner() {/**
+    public ImplCustomer getOwner() {/**
      * liefert die vergangene Zeit seit dem Einfügen
      * @return vergangene Zeit oder null wenn kein Einfügedatum gesetzt
      */
@@ -78,20 +78,6 @@ public class ImplDryBulkCargo implements DryBulkCargo {
     }
     public Date getInsertionDate() {
         return insertionDate;
-    }
-
-    @Override
-    public String toString() {
-        return "DryBulkCargo{" +
-                "customer=" + owner.getName() +
-                ", duration=" + durationOfStorage  +
-                ", storageLocation=" + storageLocation +
-                ", value=" + value +
-                ", hazards=" + hazards +
-                ", grainSize=" + grainSize +
-                ", lastInspectionDate=" + lastInspectionDate +
-
-                '}';
     }
 
 

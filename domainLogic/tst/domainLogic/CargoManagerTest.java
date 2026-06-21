@@ -14,7 +14,7 @@ import static org.mockito.Mockito.*;
 
 class CargoManagerTest {
 
-    private final Customer customer = new Customer("John Doe");
+    private final ImplCustomer customer = new ImplCustomer("John Doe");
     private final BigDecimal value = new BigDecimal(100);
     private final List<Hazard> hazards = List.of(Hazard.FLAMMABLE);
 

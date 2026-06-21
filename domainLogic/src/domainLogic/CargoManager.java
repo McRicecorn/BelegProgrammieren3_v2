@@ -16,14 +16,14 @@ public class CargoManager  {
 
 
     //Create
-    List<ImplDryBulkCargo> dryBulkCargoList = new ArrayList<>();
-    List<ImplUnitisedCargo> unitisedCargoList = new ArrayList<>();
-    List<ImplDryBulkAndUnitisedCargo> dryBulkAndUnitisedCargoList = new ArrayList<>();
-    private List<Customer> customers = new ArrayList<>();
+    private List<ImplDryBulkCargo> dryBulkCargoList = new ArrayList<>();
+    private List<ImplUnitisedCargo> unitisedCargoList = new ArrayList<>();
+    private List<ImplDryBulkAndUnitisedCargo> dryBulkAndUnitisedCargoList = new ArrayList<>();
+    private List<ImplCustomer> customers = new ArrayList<>();
 
 
     public boolean createDryBulkCargo(
-            Customer customer, Duration durationOfStorage,
+            ImplCustomer customer, Duration durationOfStorage,
             int storageLocation, BigDecimal value,
             Collection<Hazard> hazard, int grainSize ) {
 
@@ -54,7 +54,7 @@ public class CargoManager  {
 
     public boolean createUnitisedCargo(
             boolean isFragile , BigDecimal value,
-            Collection<Hazard> hazard, Customer customer,
+            Collection<Hazard> hazard, ImplCustomer customer,
             Duration durationOfStorage, int storageLocation
             ) {
 
@@ -85,7 +85,7 @@ public class CargoManager  {
 
     public boolean createDryBulkCargoAndUnitisedCargo(
             int grainSize, BigDecimal value,
-            Collection<Hazard> hazards, Customer customer,
+            Collection<Hazard> hazards, ImplCustomer customer,
             Duration durationOfStorage ,
             int storageLocation, boolean isFragile) {
 
@@ -127,7 +127,7 @@ public class CargoManager  {
         return new ArrayList<>(dryBulkAndUnitisedCargoList);
     }
 
-    public List<Customer> readCustomers() {
+    public List<ImplCustomer> readCustomers() {
         return new ArrayList<>(customers);
     }
 
@@ -195,7 +195,7 @@ public class CargoManager  {
                 || dryBulkAndUnitisedCargoList.stream().anyMatch(c -> c.getStorageLocation() == location);
     }
 
-    public boolean registerCustomer(Customer c) {
+    public boolean registerCustomer(ImplCustomer c) {
         if (c == null || customers.contains(c)) {
             return false;
         }
@@ -203,12 +203,12 @@ public class CargoManager  {
         return true;
     }
 
-    public Customer getCustomerByName(String name) {
-        Customer customer = null;
+    public ImplCustomer getCustomerByName(String name) {
+        ImplCustomer customer = null;
         if (name == null || name.isEmpty()) {
             return null;
         }
-        for (Customer c : customers) {
+        for (ImplCustomer c : customers) {
             if (c.getName().equals(name)) {
                 customer = c;
                 break;

@@ -1,9 +1,11 @@
 package domainLogic;
 
-public class Customer implements administration.Customer {
+import administration.Customer;
+
+public class ImplCustomer implements Customer {
     private String name;
 
-    public Customer(String name) {
+    public ImplCustomer(String name) {
         this.name = name;
     }
 
