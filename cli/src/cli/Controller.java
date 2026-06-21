@@ -3,11 +3,11 @@ package cli;
 import administration.Customer;
 import cargo.Cargo;
 import cargo.Hazard;
-import cli.Events.CustomerEvent;
-import cli.Handler.BasisKlassen.CargoEventHandler;
-import cli.Handler.BasisKlassen.ReadCargoEventHandler;
-import cli.Handler.ReadCustomerEventHandler;
-import cli.Payloads.*;
+import cli.EventSystem.Events.CustomerEvent;
+import cli.EventSystem.Handler.BasisKlassen.CargoEventHandler;
+import cli.EventSystem.Handler.BasisKlassen.ReadCargoEventHandler;
+import cli.EventSystem.Handler.ReadCustomerEventHandler;
+import cli.EventSystem.Payloads.*;
 import domainLogic.*;
 
 import java.math.BigDecimal;
@@ -320,6 +320,22 @@ public class Controller {
                     int deleteLocation = scanner.nextInt();
                     scanner.nextLine(); // Buffer leeren
 
+                    PayloadDeleteCargo payloadDeleteCargo = new PayloadDeleteCargo(deleteLocation);
+                    CargoEvent eventDeleteCargo = new CargoEvent(this, payloadDeleteCargo);
+                    boolean handledDelete = false;
+                    if(null!= createHandler){
+                        boolean handler= createHandler.handle(eventDeleteCargo);
+                        if(handler){
+                            handledDelete = true;
+                        }
+                    }
+
+                        if (handledDelete) {
+                                    System.out.println("Cargo deleted successfully!");
+
+                                }else{
+                                    System.out.println("Failed to delete Cargo.");
+                                }
 
 
 

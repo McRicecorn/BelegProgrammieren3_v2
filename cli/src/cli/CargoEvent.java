@@ -1,7 +1,7 @@
 package cli;
 
-import cli.Events.EventObject;
-import cli.EventSystem.IPayload;
+import cli.EventSystem.Events.EventObject;
+import cli.EventSystem.Interfaces.IPayload;
 
 //CargoEvent?
 public class CargoEvent extends EventObject {
